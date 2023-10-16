@@ -11,6 +11,17 @@
       body {
 	  margin: 1em;
       }
+      #loading {
+	  top: 0;
+	  left: 0;	 
+	  position: fixed;
+	  height: 100vh;
+	  width: 100vw;
+	  background-color: rgba(128,128,128,0.6);
+	  z-index: 99999;
+	  text-align: center;
+	  font-size: 10em;	  
+      }
       #container {
 	  display: grid;
 	  height: 100vh;
@@ -48,11 +59,14 @@
 	resp = await fetch(assignmentRoot+"/main.py");
 	code = await resp.text();
 	editor.session.setValue(code);
+	
+	document.getElementById('loading').style.visibility = 'hidden';
       }
 
       async function run() {
+	document.getElementById('loading').style.visibility = 'visible';
+	
 	window.pyodide = await loadPyodide();
-
 	pyodide.runPython(
 	  [`with open('turtle.py','w') as f:`,
 	   `    f.write("from unittest.mock import MagicMock\\n")`,
@@ -85,6 +99,8 @@
 	pyodide.runPython(runTest);
 	
 	window.test_result = pyodide.globals.get('result').toJs()
+	
+	document.getElementById('loading').style.visibility = 'hidden';	
 	document.getElementById('result').innerHTML = test_result.toString()
 	  .replace(/&/g, '&amp;')
 	  .replace(/</g, '&lt;')
@@ -104,7 +120,9 @@
 	result
       </div>
     </div>
-    
+    <div id="loading">
+      Grading...
+    </div>    
     <script>
       load()
     </script>
