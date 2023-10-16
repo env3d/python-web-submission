@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Python Submission</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/css/ace.min.css">
     <style type="text/css" media="screen">
       body {
-	  margin: 0;
+	  margin: 1em;
       }
       #container {
 	  display: grid;
@@ -22,6 +23,7 @@
       #editor {
 	  grid-area: 'editor';
 	  height: 80vh;
+	  width: 80vw;
       }
       #result {
 	  height: 10vh;
@@ -36,9 +38,8 @@
 	
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
-	window.assignmentRoot = urlParams.get('label') || "labs/lab1";
-	
-	window.pyodide = await loadPyodide();
+
+	window.assignmentRoot = urlParams.get('label') || "labs/lab1";	
 	
 	window.editor = ace.edit("editor");
 	editor.setAutoScrollEditorIntoView(true);
@@ -49,12 +50,22 @@
 	editor.session.setValue(code);
       }
 
-      async function run() {	
+      async function run() {
+	window.pyodide = await loadPyodide();
+
+	pyodide.runPython(
+	  [`with open('turtle.py','w') as f:`,
+	   `    f.write("from unittest.mock import MagicMock\\n")`,
+	   `    f.write("def Turtle():\\n")`,
+	   `    f.write("    return MagicMock()\\n")`
+	  ].join('\n')
+	);
+      
 	user_content = "with open('main.py', 'w') as f:\n"
 	user_content += editor.session.getValue().split('\n')
 	  .map( (line) => `    f.write("${line.replaceAll('"','\\"')}\\n")`)
 	  .join('\n');
-	console.log(user_content);
+	// console.log(user_content);
 	pyodide.runPython(user_content)
 	mainpkg = pyodide.pyimport("main");
 
