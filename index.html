@@ -82,7 +82,7 @@
 
     <script src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
-    <script src="skulpt-dist-master/skulpt.min.js"></script>
+    <script src="skulpt-dist-master/skulpt.js"></script>
     <script src="skulpt-dist-master/skulpt-stdlib.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script> 
     <script src="skulpt-run.js"></script>
@@ -99,7 +99,7 @@
 	
 	let containerHeight = window.getComputedStyle(document.getElementById('container')).height.replace('px','');
 	// adjust the height of all the major elements: run, test, editor, output, console	
-	document.getElementById('run').style.height = (containerHeight*0.05)+'px';
+	document.getElementById('run').style.height = (containerHeight*0.05)+'px';	
 	document.getElementById('test').style.height = (containerHeight*0.05)+'px';		
 	document.getElementById('output').style.height = (containerHeight*0.7)+'px';
 	document.getElementById('editor').style.height = (containerHeight*0.7)+'px';		

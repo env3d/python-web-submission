@@ -31,12 +31,23 @@ function initSkulpt(){
   });
 
   Sk.globals = { __name__: new Sk.builtin.str("__main__")};
-  
+
+  // Setup Turtle 
   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'output';
   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).width = 0;
   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).height = 0;
-
-
+  // Setup image  
+  // need to specify the id to a canvas for the
+  // builtin 'image' module to work
+  Sk.canvas = document.getElementById('output').id;
+  Sk.imageProxy = (str) => {
+    return str.startsWith('http') ? str :
+      window.location.protocol + '//'
+      + window.location.host
+      + window.location.pathname + '/'
+      + window.assignmentRoot + '/' + str;
+  };
+  
 }
 
 // Here's everything you need to run a python program in skulpt
@@ -56,6 +67,7 @@ function runSkulpt(prog) {
     console.log('success');
   }, function(err) {
     console.log(err.toString());
+    throw(err);
   });
   /*
   var myPromise = Sk.misceval.asyncToPromise(function() {
