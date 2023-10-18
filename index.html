@@ -7,10 +7,13 @@
     <title>Python Submission</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/css/ace.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
     <style type="text/css" media="screen">
       body {
-	  margin: 1em;
+	  max-width: 90%;
+	  overflow: hidden;
       }
+      
       #loading {
 	  top: 0;
 	  left: 0;	 
@@ -22,48 +25,170 @@
 	  text-align: center;
 	  font-size: 10em;	  
       }
+
       #container {
 	  display: grid;
 	  height: 100vh;
-	  width: 100vw;
-	  grid-template-areas: 'run','editor','result';
+	  width: 100%;
+	  grid-template-areas: 'run test'
+			       'editor output'
+			       'console console';
       }
+      
       #run {
-	  height: 10vh;
+	  grid-area: run;
       }
+      
+      #test {
+	  grid-area: test;
+      }
+      
       #editor {
-	  grid-area: 'editor';
-	  height: 80vh;
-	  width: 80vw;
+	  grid-area: editor;
+	  width: 60%;
       }
-      #result {
-	  height: 10vh;
-	  grid-area: 'result';	  
+      
+      #output {
+	  grid-area: output;
+	  background-color: white;
       }
+      
+      #console {
+	  margin: 0;
+	  grid-area: console;
+	  overflow: auto;
+	  margin-bottom: 5%;
+      }
+      
     </style>
+  </head>
+  <body onresize="resize()">
+    <div id="container">
+      <div id="run">
+	<button onclick="runSkulpt()">Run</button>
+      </div>
+      <div id="test">
+	<button onclick="test()">Test and Submit</button>
+      </div>
+      <div id="editor"></div>
+      <div id="output"></div>
+      <div id="console"></div>
+    </div>
+    <div id="loading">
+      Grading...
+    </div>
+
     <script src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
+    <script src="skulpt-dist-master/skulpt.min.js"></script>
+    <script src="skulpt-dist-master/skulpt-stdlib.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script> 
+    <script src="skulpt-run.js"></script>
+
     <script>
+
+      function resize() {
+	// adjust the width of the editor and container
+	let editorWidth = window.getComputedStyle(document.getElementById('editor')).width.replace('px','');	
+	let containerWidth = window.getComputedStyle(document.getElementById('container')).width.replace('px','');
+	document.getElementById('editor').style.width = (containerWidth*0.6)+'px';
+	document.getElementById('output').style.width = (containerWidth*0.4)+'px';
+	//document.getElementById('output').style.width = (containerWidth-editorWidth)+'px';
+	
+	let containerHeight = window.getComputedStyle(document.getElementById('container')).height.replace('px','');
+	// adjust the height of all the major elements: run, test, editor, output, console
+	document.getElementById('run').style.height = (containerHeight*0.05)+'px';
+	document.getElementById('test').style.height = (containerHeight*0.05)+'px';		
+	document.getElementById('output').style.height = (containerHeight*0.7)+'px';
+	document.getElementById('editor').style.height = (containerHeight*0.7)+'px';		
+	document.getElementById('console').style.height = (containerHeight*0.2)+'px';	
+	
+      }
       
       async function load() {
+	window.editor = ace.edit("editor");
 	
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
-
-	window.assignmentRoot = urlParams.get('label') || "labs/lab1";	
+	window.assignmentRoot = urlParams.get('path') || "labs/lab1";
 	
-	window.editor = ace.edit("editor");
+	editor.setFontSize(parseInt(urlParams.get('fontsize')) || 12);	
 	editor.setAutoScrollEditorIntoView(true);
-	editor.setTheme("ace/theme/monokai");
+	editor.setTheme("ace/theme/monokai");	
 	editor.session.setMode("ace/mode/python");
 	resp = await fetch(assignmentRoot+"/main.py");
 	code = await resp.text();
 	editor.session.setValue(code);
+
+	resize();
+
+	initSkulpt();
+
+	window.term = new Terminal();
+        term.open(document.getElementById('console'));
+	term.prompt = () => {
+	  term.write('\r\n>>> ');
+	};
+	term.write('>>> ');
+	command = '';
+	term.onData(e => {
+	  switch (e) {
+          case '\u0003': // Ctrl+C
+            term.write('^C');
+	    term.prompt();
+            break;
+          case '\r': // Enter
+	    //runCommand(term, command);
+	    if (command.length > 0) {
+
+	      myPromise = Sk.misceval.asyncToPromise(function() {    
+		return Sk.importMainWithBody("<stdin>", false, `${command}`, true);
+	      });
+	      myPromise.then(function(mod) {
+		console.log('success');
+		command = ''
+		term.prompt();
+	      }, function(err) {
+		term.write('\r\n');
+		term.write(e.toString());
+		command = ''
+		term.prompt();
+	      });
+	      
+	      /*
+	      try {
+		Sk.importMainWithBody("<stdin>", false, `${command}`, true);
+	      } catch (e) {
+		term.write('\r\n');
+		term.write(e.toString());
+	      }
+              command = '';
+	      term.prompt()
+	      */
+	    }
+
+            break;
+          case '\u007F': // Backspace (DEL)
+            // Do not delete the prompt
+            if (term._core.buffer.x > 4) {
+              term.write('\b \b');
+              if (command.length > 0) {
+		command = command.substr(0, command.length - 1);
+              }
+            }
+            break;
+          default: // Print all other characters for demo
+            if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
+              command += e;
+              term.write(e);
+            }
+	  }
+	});
 	
 	document.getElementById('loading').style.visibility = 'hidden';
       }
 
-      async function run() {
+      async function test() {
 	document.getElementById('loading').style.visibility = 'visible';
 	
 	window.pyodide = await loadPyodide();
@@ -80,6 +205,7 @@
 	  .map( (line) => `    f.write("${line.replaceAll('"','\\"')}\\n")`)
 	  .join('\n');
 	// console.log(user_content);
+	
 	pyodide.runPython(user_content)
 	mainpkg = pyodide.pyimport("main");
 
@@ -100,31 +226,27 @@
 	
 	window.test_result = pyodide.globals.get('result').toJs()
 	
-	document.getElementById('loading').style.visibility = 'hidden';	
-	document.getElementById('result').innerHTML = test_result.toString()
+	document.getElementById('loading').style.visibility = 'hidden';
+	/*
+	document.getElementById('console').innerHTML = test_result.toString()
 	  .replace(/&/g, '&amp;')
 	  .replace(/</g, '&lt;')
 	  .replace(/>/g, '&gt;')
 	  .replace(/"/g, '&quot;');
-      }      
-      </script>
-  </head>
-  <body>
-    <div id="container">
-      <div id="run">
-	<button onclick="run()">Submit</button>
-      </div>
-      <div id="editor">
-      </div>
-      <div id="result">
-	result
-      </div>
-    </div>
-    <div id="loading">
-      Grading...
-    </div>    
-    <script>
+	*/
+
+	term.write('\r\n');
+	term.write(test_result.toString())
+	/*
+		   .replace(/&/g, '&amp;')
+		   .replace(/</g, '&lt;')
+		   .replace(/>/g, '&gt;')
+		   .replace(/"/g, '&quot;'));
+	*/
+	term.prompt();
+	
+      }
       load()
-    </script>
+      </script>
   </body>
 </html>
