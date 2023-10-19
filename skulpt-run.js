@@ -2,7 +2,7 @@
 
 // output functions are configurable.  This one just appends some text
 // to a pre element.
-function outf(text) {
+function outputConsole(text) {
   text = text.trim();
   if (text.length > 0) {
     term.write('\r\n');
@@ -11,7 +11,12 @@ function outf(text) {
 
   //var mypre = document.getElementById("console"); 
   //mypre.innerHTML = mypre.innerHTML + text; 
-} 
+}
+
+function output(text) {
+  document.getElementById("output").innerHTML = text;  
+}
+
 function builtinRead(x) {
   if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
     throw "File not found: '" + x + "'";
@@ -24,7 +29,7 @@ function initSkulpt(){
 
   console.log('init skulpt');
   Sk.configure( {
-    output: outf,
+    output: output,
     read: builtinRead,
     retainGlobals: true,
     __future__: Sk.python3
@@ -57,8 +62,7 @@ function initSkulpt(){
 // call Sk.importMainWithBody()
 function runSkulpt(prog) {
   var prog = editor.session.getValue();
-  //var mypre = document.getElementById("console"); 
-  //mypre.innerHTML = '';
+  document.getElementById('output').innerHTML = '';
 
   myPromise = Sk.misceval.asyncToPromise(function() {    
     return Sk.importMainWithBody("<stdin>", false, prog, true);
@@ -66,6 +70,7 @@ function runSkulpt(prog) {
   myPromise.then(function(mod) {
     console.log('success');
   }, function(err) {
+    document.getElementById('output').innerHTML = err.toString();
     console.log(err.toString());
     throw(err);
   });

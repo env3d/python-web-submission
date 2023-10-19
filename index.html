@@ -53,6 +53,7 @@
 	  background-color: white;
 	  color: black;
 	  overflow: scroll;
+	  margino: 0;
       }
       
       #console {
@@ -102,6 +103,7 @@
 	document.getElementById('run').style.height = (containerHeight*0.05)+'px';	
 	document.getElementById('test').style.height = (containerHeight*0.05)+'px';		
 	document.getElementById('output').style.height = (containerHeight*0.7)+'px';
+	document.getElementById('output').style.margin = 0;
 	document.getElementById('editor').style.height = (containerHeight*0.7)+'px';		
 	document.getElementById('console').style.height = (containerHeight*0.2)+'px';	
 	
@@ -115,6 +117,7 @@
 	window.assignmentRoot = urlParams.get('path') || "labs/lab1";
 	
 	window.editorFontSize = parseInt(urlParams.get('fontsize')) || 12;
+	document.getElementById('output').style.fontSize = editorFontSize+"px";
 	
 	editor.setAutoScrollEditorIntoView(true);
 	editor.setTheme("ace/theme/monokai");	
@@ -156,14 +159,17 @@
 	      break;
 	    }
 	    if (command.length > 0) {
-	      myPromise = Sk.misceval.asyncToPromise(function() {    
+	      myPromise = Sk.misceval.asyncToPromise(function() {
+		Sk.output = outputConsole;
 		return Sk.importMainWithBody("<stdin>", false, `${command}`, true);
 	      });
 	      myPromise.then(function(mod) {
 		console.log('success');
+		Sk.output = output;		
 		command = ''
 		term.prompt();
 	      }, function(err) {
+		Sk.output = output;
 		term.write('\r\n');
 		term.write(err.toString());
 		command = ''
@@ -250,21 +256,6 @@
 	  .replace(/"/g, '&quot;');
 	
 	document.getElementById('loading').style.visibility = 'hidden';
-	/*
-	document.getElementById('console').innerHTML = test_result.toString()
-	  .replace(/&/g, '&amp;')
-	  .replace(/</g, '&lt;')
-	  .replace(/>/g, '&gt;')
-	  .replace(/"/g, '&quot;');
-	*/
-
-
-	/*
-		   .replace(/&/g, '&amp;')
-		   .replace(/</g, '&lt;')
-		   .replace(/>/g, '&gt;')
-		   .replace(/"/g, '&quot;'));
-	*/
 	term.prompt();
 	
       }
