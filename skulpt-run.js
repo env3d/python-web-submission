@@ -14,10 +14,11 @@ function outputConsole(text) {
 }
 
 function output(text) {
-  document.getElementById("output").innerHTML = text;  
+  document.getElementById("output").innerHTML += text;
 }
 
 function builtinRead(x) {
+  console.log('Trying to read '+x);
   if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
     throw "File not found: '" + x + "'";
   return Sk.builtinFiles["files"][x];
@@ -26,7 +27,6 @@ function builtinRead(x) {
 function initSkulpt(){
   //Sk.pre = "console";
   
-
   console.log('init skulpt');
   Sk.configure( {
     output: output,
@@ -51,8 +51,7 @@ function initSkulpt(){
       + window.location.host
       + window.location.pathname + '/'
       + window.assignmentRoot + '/' + str;
-  };
-  
+  };  
 }
 
 // Here's everything you need to run a python program in skulpt
@@ -74,14 +73,4 @@ function runSkulpt(prog) {
     console.log(err.toString());
     throw(err);
   });
-  /*
-  var myPromise = Sk.misceval.asyncToPromise(function() {
-    return Sk.importMainWithBody("<stdin>", false, prog, true);
-  });
-  myPromise.then(function(mod) {
-    console.log('success');
-  }, function(err) {
-    console.log(err.toString());
-  });
-  */
-} 
+}

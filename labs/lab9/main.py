@@ -39,14 +39,31 @@ You will need to use these functions to complete the exercises.  Pretty much all
 of itmes using a for loop and process each item in the list.
 
 """
-
+import micropip
+await micropip.install("nltk")
 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 from urllib.request import urlopen, Request
-import json 
+import json
+from pathlib import Path
+import os
 
-nltk.download('vader_lexicon')
+
+from js import fetch
+response = await fetch('vader_lexicon.zip')
+js_buffer = await response.arrayBuffer()
+py_buffer = js_buffer.to_py()  # this is a memoryview
+stream = py_buffer.tobytes()  # now we have a bytes object
+
+#print(text)
+# Need to put the txt file here: /nltk_data/sentiment/vader_lexicon.zip/vader_lexicon/vader_lexicon.txt
+
+d = Path('/home/pyodide/nltk_data/sentiment/')
+d.mkdir(parents=True, exist_ok=True)
+Path('/home/pyodide/nltk_data/sentiment/vader_lexicon.zip').write_bytes(stream)
+
+#nltk.download('vader_lexicon')
 sid = SentimentIntensityAnalyzer()
 
 

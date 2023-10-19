@@ -1,5 +1,5 @@
 """
-Lab 11
+Lab 10
 
 This lab is all about working with files.  The gerenal pattern for working
 with files to use loops and process a file one line at a time.
@@ -8,7 +8,7 @@ The typical reason why we work with files is because these files are too big or
 change all the time so the data cannot be included inside our program.  
 
 For this lab We are going to use data from IMDb (Internet Movie Database).  I
-have prepared 2 data files for you:
+have prepared 2 data files for you (only contains data from 2020-present):
 
  - title.basics.tsv.gz - Contains the following fields for titles:
 
@@ -19,7 +19,7 @@ have prepared 2 data files for you:
     originalTitle (string) - original title, in the original language
     isAdult (boolean) - 0: non-adult title; 1: adult title
     startYear (YYYY) – represents the release year of a title.
-    endYear (YYYY) – TV Series end year. ‘\\N’ for all other title types
+    endYear (YYYY) – TV Series end year. \N for all other title types
     runtimeMinutes – primary runtime of the title, in minutes
     genres (string array) – includes up to three genres associated with the title
     
@@ -44,7 +44,7 @@ out how many lines a file has.  You have to actually loop over
 a file an use the accumulator pattern to count the lines.
 
 Using the technique described in 
-https://runestone.academy/ns/books/published/thinkcspy/Files/Iteratingoverlinesinafile.html,
+https://runestone.academy/ns/books/published/thinkcspy/Files/Iteratingoverlinesinafile.html
 complete the following function so it returns the number of 
 lines in the file title.basics.tsv
 """
@@ -84,7 +84,7 @@ Note that the genre is stored in the 9th field, but since a movie can have mutip
 genres, it is a string separated by commas.
 
 For example, the following is the entry for 'The Hunger Games':
-tt1392170 movie The_Hunger_Games The_Hunger_Games 0 2012 \\N 142 Action,Adventure,Sci-Fi
+tt1392170 movie The_Hunger_Games The_Hunger_Games 0 2012 \N 142 Action,Adventure,Sci-Fi
 
 It belongs to 3 genres: Action, Adventure, and Sci-Fi
 

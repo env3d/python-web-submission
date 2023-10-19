@@ -65,17 +65,17 @@
       
     </style>
   </head>
-  <body onresize="resize()">
+  <body onload="load()" onresize="resize()">
     <div id="container">
       <div id="run">
-	<button onclick="runSkulpt()">Run</button>
+	<button onclick="window.runPython()">Run</button>
       </div>
       <div id="test">
-	<button onclick="test()">Test and Submit</button>
+	<button onclick="runTest()">Test and Submit</button>
       </div>
       <div id="editor"></div>
       <pre id="output"></pre>
-      <div id="console"></div>
+      <div id="console"></div>      
     </div>
     <div id="loading">
       Grading...
@@ -87,7 +87,9 @@
     <script src="skulpt-dist-master/skulpt-stdlib.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script> 
     <script src="skulpt-run.js"></script>
-
+    <script src="pyodide-run.js"></script>
+    <script src="terminal.js"></script>
+    
     <script>
 
       function resize() {
@@ -106,10 +108,12 @@
 	document.getElementById('output').style.margin = 0;
 	document.getElementById('editor').style.height = (containerHeight*0.7)+'px';		
 	document.getElementById('console').style.height = (containerHeight*0.2)+'px';	
-	
-      }      
+      }
 
-      async function load() {      
+      async function load() {
+	
+	// Set the default interactive python runtime
+	window.runPython = runSkulpt;
         window.editor = ace.edit("editor");      
 	
 	const queryString = window.location.search;
@@ -132,134 +136,36 @@
 	if (r.status != 200) {
 	  document.getElementById('test').style.visibility = 'hidden';
 	}
+
+	r = await fetch(assignmentRoot+"/init.js", {method: 'HEAD'});	
+	if (r.status == 200) {
+	  node = document.createElement('script');
+	  node.src = assignmentRoot+"/init.js";
+	  document.body.append(node);
+	}
+
 	resize();
-
 	initSkulpt();
-
-	window.term = new Terminal();
-	term.options.fontSize = editorFontSize;
-        term.open(document.getElementById('console'));
-	term.prompt = () => {
-	  term.write('\r\n>>> ');
-	};
-	term.write('>>> ');
-	command = '';
-	term.onData(e => {
-	  switch (e) {
-          case '\u0003': // Ctrl+C
-            term.write('^C');
-	    term.prompt();
-            break;
-          case '\r': // Enter
-	    //runCommand(term, command);
-	    if (command === 'clear') {
-	      command = '';
-	      term.prompt();
-	      term.clear();	      
-	      break;
-	    }
-	    if (command.length > 0) {
-	      myPromise = Sk.misceval.asyncToPromise(function() {
-		Sk.output = outputConsole;
-		return Sk.importMainWithBody("<stdin>", false, `${command}`, true);
-	      });
-	      myPromise.then(function(mod) {
-		console.log('success');
-		Sk.output = output;		
-		command = ''
-		term.prompt();
-	      }, function(err) {
-		Sk.output = output;
-		term.write('\r\n');
-		term.write(err.toString());
-		command = ''
-		term.prompt();
-	      });	      
-	    } else {
-	      term.prompt();
-	    }
-
-            break;
-          case '\u007F': // Backspace (DEL)
-            // Do not delete the prompt
-            if (term._core.buffer.x > 4) {
-              term.write('\b \b');
-              if (command.length > 0) {
-		command = command.substr(0, command.length - 1);
-              }
-            }
-            break;
-          default: // Print all other characters for demo
-            if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
-              command += e;
-              term.write(e);
-            }
-	  }
-	});
+	
+	window.term = createTerminal('console') 
 	
 	document.getElementById('loading').style.visibility = 'hidden';
       }
 
-      async function test() {
-	document.getElementById('loading').style.visibility = 'visible';
-	
-	window.pyodide = await loadPyodide();
-	pyodide.runPython(
-	  [`with open('turtle.py','w') as f:`,
-	   `    f.write("from unittest.mock import MagicMock\\n")`,
-	   `    f.write("def Turtle():\\n")`,
-	   `    f.write("    return MagicMock()\\n")`
-	  ].join('\n')
-	);
-      
-	user_content = "with open('main.py', 'w') as f:\n"
-	user_content += editor.session.getValue().split('\n')
-	  .map( (line) => `    f.write("${line.replaceAll('"','\\"')}\\n")`)
-	  .join('\n');
-	// console.log(user_content);
-	
-	pyodide.runPython(user_content)
-	mainpkg = pyodide.pyimport("main");
-
-	await pyodide.runPythonAsync([
-	  `from pyodide.http import pyfetch`,
-	  `response = await pyfetch("${assignmentRoot}/test.py")`,
-	  `with open("test.py", "wb") as f:`,
-	  `    f.write(await response.bytes())`
-	].join('\n'));
-	testpkg = pyodide.pyimport("test");
-	
-	runTest = [
-	  "import test",
-	  "suite = test.unittest.TestLoader().loadTestsFromModule(test)",
-	  "result = test.unittest.TextTestRunner().run(suite)"
-	].join('\n');	  
-	pyodide.runPython(runTest);
-	
-	window.test_result = pyodide.globals.get('result').toJs()
-
-	
-	document.getElementById('output').innerHTML = test_result.errors.toJs().toString()
-	  .replace(/&/g, '&amp;')
-	  .replace(/</g, '&lt;')
-	  .replace(/>/g, '&gt;')
-	  .replace(/"/g, '&quot;');
-	document.getElementById('output').innerHTML += test_result.failures.toJs().toString()
-	  .replace(/&/g, '&amp;')
-	  .replace(/</g, '&lt;')
-	  .replace(/>/g, '&gt;')
-	  .replace(/"/g, '&quot;');
-	document.getElementById('output').innerHTML += test_result.toString()
-	  .replace(/&/g, '&amp;')
-	  .replace(/</g, '&lt;')
-	  .replace(/>/g, '&gt;')
-	  .replace(/"/g, '&quot;');
-	
-	document.getElementById('loading').style.visibility = 'hidden';
-	term.prompt();
-	
+      // attach a file to the DOM so python open can work
+      async function load_file_to_DOM(filename) {
+	let file_url = window.location.protocol + '//'
+	    + window.location.host
+	    + window.location.pathname + '/'
+	    + window.assignmentRoot + '/' + filename;
+	f = await fetch(file_url);  
+	node = document.createElement('pre');
+	node.id = filename;
+	node.innerHTML = await f.text();
+	document.body.append(node);	
       }
-      load()
+
+
       </script>
   </body>
 </html>
