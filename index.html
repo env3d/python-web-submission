@@ -150,7 +150,7 @@
 	PWS.editor.setFontSize(PWS.fontsize);
 	document.getElementById('output').style.fontSize = PWS.fontsize+"px";
 
-	history.pushState(null, null, `/?path=${PWS.assignmentRoot}`);
+	history.pushState(null, null, `${window.location.pathname}?path=${PWS.assignmentRoot}`);
 	
 
 	PWS.editor.setAutoScrollEditorIntoView(true);
@@ -179,7 +179,7 @@
 	let resp = await fetch(PWS.assignmentRoot+"/main.py");
 	let code = await resp.text();
         PWS.editor.session.setValue(code);     
-
+	
 	let r = await fetch(PWS.assignmentRoot+"/test.py", {method: 'HEAD'});
 	if (r.status != 200) {
 	  document.getElementById('test').style.visibility = 'hidden';
