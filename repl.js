@@ -22,7 +22,21 @@ $(function () {
     greetings: ['Python Web Submission Console (absolutely no guarantees)',
                 'Click RUN to active the console'].join('\n'),
     name: 'skulpt_console',
-    prompt: '>>> '
+    prompt: '>>> ',
+    completion: function(command, callback) {
+      obj = command.replace(/(.*)\..*/,"$1");
+      if (Sk.globals) {
+        callback(Object.keys(Sk.globals)
+                 .concat(Object.keys(Sk.builtins)));
+      } else {
+        callback([]);
+      }
+    },
+    keypress: function(event, term) {
+      if (!Sk.globals) {
+        return false;
+      }
+    }
   });
 
   // Export repl to global
@@ -96,7 +110,6 @@ $(function () {
           lines.push("evaluationresult = " + lines.pop());
           //print the result if not None
           lines.push("if not evaluationresult == None: print(repr(evaluationresult))");
-          console.log(lines);
         }
       }
     }
@@ -108,7 +121,14 @@ $(function () {
       }
       else {
         Sk.output = Sk.output !== skOutputToTerminal ? skOutputToTerminal : Sk.output;
-        Sk.importMainWithBody("repl", false, lines.join('\n'));            
+        let myPromise = Sk.misceval.asyncToPromise(function() {    
+          return Sk.importMainWithBody("repl", false, lines.join('\n'), true);
+        });
+        myPromise.then(function(mod) {
+          console.log('success');
+        }, function(err) {
+          repl.echo(err);
+        });        
       }
     } catch (err) {
       repl.echo(err);

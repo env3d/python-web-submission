@@ -83,7 +83,7 @@
     </div>
     <script src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ext-language_tools.js"></script>
     <script src="third-party/skulpt-dist-master/skulpt.js"></script>
     <script src="third-party/skulpt-dist-master/skulpt-stdlib.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
@@ -94,7 +94,6 @@
 
     <script src="skulpt-run.js"></script>
     <script src="pyodide-run.js"></script>
-    <script src="terminal.js"></script>
     <script src="repl.js"></script>
     
     <script>
@@ -104,6 +103,8 @@
       var PWS = {
 	assignmentRoot: null,
 	fontsize: null,
+	editorwidth: null,
+	consoleheight: null,
 	runtime: null,
 	runtest: null,
 	terminal: null,	
@@ -113,18 +114,18 @@
 	// adjust the width of the editor and container
 	let editorWidth = window.getComputedStyle(document.getElementById('editor')).width.replace('px','');	
 	let containerWidth = window.getComputedStyle(document.getElementById('container')).width.replace('px','');
-	document.getElementById('editor').style.width = (containerWidth*0.6)+'px';
-	document.getElementById('output').style.width = (containerWidth*0.4)+'px';
+	document.getElementById('editor').style.width = (containerWidth * PWS.editorwidth)+'px';
+	document.getElementById('output').style.width = (containerWidth * (1 - PWS.editorwidth))+'px';
 	//document.getElementById('output').style.width = (containerWidth-editorWidth)+'px';
 	
 	let containerHeight = window.getComputedStyle(document.getElementById('container')).height.replace('px','');
 	// adjust the height of all the major elements: run, test, editor, output, console	
-	document.getElementById('run').style.height = (containerHeight*0.05)+'px';	
-	document.getElementById('test').style.height = (containerHeight*0.05)+'px';		
-	document.getElementById('output').style.height = (containerHeight*0.7)+'px';
+	document.getElementById('run').style.height = (containerHeight * 0.05)+'px';	
+	document.getElementById('test').style.height = (containerHeight * 0.05)+'px';		
+	document.getElementById('output').style.height = (containerHeight * (0.9 - PWS.consoleheight) )+'px';
 	document.getElementById('output').style.margin = 0;
-	document.getElementById('editor').style.height = (containerHeight*0.7)+'px';		
-	document.getElementById('console').style.height = (containerHeight*0.2)+'px';	
+	document.getElementById('editor').style.height = (containerHeight * (0.9 - PWS.consoleheight) )+'px';		
+	document.getElementById('console').style.height = (containerHeight * PWS.consoleheight)+'px';	
       }
 
       async function load() {
@@ -132,19 +133,48 @@
 	// Set the default interactive python runtime
 	PWS.runtime = runSkulpt;
 	PWS.runtest = runTest;
+	ace.require("ace/ext/language_tools");	
         PWS.editor = ace.edit("editor");
+	PWS.editor.setOptions({
+	  enableBasicAutocompletion: true
+	});
 	    
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
 	PWS.assignmentRoot = urlParams.get('path') || "labs/lab1";
 	
-	PWS.fontsize = parseInt(urlParams.get('fontsize')) || 12;
-	document.getElementById('output').style.fontSize = PWS.fontsize+"px";
+	PWS.consoleheight = parseFloat(urlParams.get('consoleheight')) || 0.2;
+	PWS.editorwidth = parseFloat(urlParams.get('editorwidth')) || 0.6;
 	
+	PWS.fontsize = parseInt(urlParams.get('fontsize')) || 12;
+	PWS.editor.setFontSize(PWS.fontsize);
+	document.getElementById('output').style.fontSize = PWS.fontsize+"px";
+
+	history.pushState(null, null, `/?path=${PWS.assignmentRoot}`);
+	
+
 	PWS.editor.setAutoScrollEditorIntoView(true);
 	PWS.editor.setTheme("ace/theme/monokai");	
 	PWS.editor.session.setMode("ace/mode/python");
-	PWS.editor.setFontSize(PWS.fontsize);
+	
+	let staticWordCompleter = {
+	  getCompletions: function(editor, session, pos, prefix, callback) {
+	    wordList = [];
+	    if (Sk.globals) {
+	      wordList = Object.keys(Sk.globals).concat(Object.keys(Sk.builtins));
+	    }	    
+            callback(null, wordList.map(function(word) {
+              return {
+		caption: word,
+		value: word,
+		meta: "static"
+              };
+            }));
+	    
+	  }
+	}
+	PWS.editor.completers = [staticWordCompleter];
+
 	
 	let resp = await fetch(PWS.assignmentRoot+"/main.py");
 	let code = await resp.text();
@@ -174,7 +204,8 @@
 	let file_url = window.location.protocol + '//'
 	    + window.location.host
 	    + window.location.pathname + '/'
-	    + window.assignmentRoot + '/' + filename;
+	    + PWS.assignmentRoot + '/' + filename;
+	console.log('fetching '+file_url);
 	f = await fetch(file_url);  
 	node = document.createElement('pre');
 	node.id = filename;
