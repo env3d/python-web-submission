@@ -1,28 +1,39 @@
 
 
+async function getPyodide() {
+  let pyodide = await loadPyodide();
+  
+  // load all necesary packages
+  await pyodide.loadPackage('nltk');
+
+  let resp = await fetch('/vader_lexicon.zip');
+  let s_buffer = await resp.arrayBuffer();
+  pyodide.FS.mkdirTree('/home/pyodide/nltk_data/sentiment/');  
+  pyodide.FS.writeFile('/home/pyodide/nltk_data/sentiment/vader_lexicon.zip', new Uint8Array(s_buffer));
+  pyodide.setStdin();
+  pyodide.setStdout( { batched: (str) => output.innerHTML += str + '\n' });
+  pyodide.setStderr( { batched: (str) => output.innerHTML += str + '\n' });
+  return pyodide;
+}
 
 async function runPyodide() {
   
   codeString = editor.session.getValue();
   output = document.getElementById('output');
   output.innerHTML = '';
-  
-  window.pyodide = await loadPyodide();
-  await pyodide.loadPackage('micropip');
-  pyodide.setStdin();
-  pyodide.setStdout( { batched: (str) => output.innerHTML += str + '\n' });
+
+  window.pyodide = await getPyodide();
   
   pyodide.runPythonAsync(codeString);
 }
-
 
 // we use pyodide to run our tests
 async function runTest() {
   
 	document.getElementById('loading').style.visibility = 'visible';
-	
-	window.pyodide = await loadPyodide();
-  await pyodide.loadPackage('micropip');
+
+  window.pyodide = await getPyodide();
+  
   // Create a fake turtle
   pyodide.FS.writeFile('turtle.py', ["from unittest.mock import MagicMock",
                                      "def Turtle():",
