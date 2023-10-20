@@ -4,8 +4,8 @@ async function getPyodide() {
   let pyodide = await loadPyodide();
   
   // load all necesary packages
+  /*
   await pyodide.loadPackage('nltk');
-
   let resp = await fetch('/vader_lexicon.zip');
   let s_buffer = await resp.arrayBuffer();
   pyodide.FS.mkdirTree('/home/pyodide/nltk_data/sentiment/');  
@@ -13,18 +13,20 @@ async function getPyodide() {
   pyodide.setStdin();
   pyodide.setStdout( { batched: (str) => output.innerHTML += str + '\n' });
   pyodide.setStderr( { batched: (str) => output.innerHTML += str + '\n' });
+  */
   return pyodide;
 }
 
 async function runPyodide() {
   
-  codeString = editor.session.getValue();
+  codeString = PWS.editor.session.getValue();
   output = document.getElementById('output');
   output.innerHTML = '';
 
   window.pyodide = await getPyodide();
   
-  pyodide.runPythonAsync(codeString);
+  await pyodide.runPythonAsync(codeString);
+  PWS.terminal.clear();
 }
 
 // we use pyodide to run our tests
@@ -39,11 +41,11 @@ async function runTest() {
                                      "def Turtle():",
                                      "    return MagicMock()"].join('\n'));
   // Put the user code into main.py
-  pyodide.FS.writeFile('main.py',editor.session.getValue());  
+  pyodide.FS.writeFile('main.py', PWS.editor.session.getValue());  
   let mainpkg = pyodide.pyimport('main');
 
   // Create test.py in filesystem  
-  let resp = await fetch(`${assignmentRoot}/test.py`);
+  let resp = await fetch(`${PWS.assignmentRoot}/test.py`);
   let testFileContent = await resp.text();
   pyodide.FS.writeFile('test.py', testFileContent);
   let testpkg = pyodide.pyimport("test");
@@ -69,5 +71,5 @@ async function runTest() {
 	});
 	
 	document.getElementById('loading').style.visibility = 'hidden';
-	term.prompt();
+	PWS.terminal.prompt();
 }

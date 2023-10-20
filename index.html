@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/css/ace.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.37.2/css/jquery.terminal.min.css" rel="stylesheet"/>
     <style type="text/css" media="screen">
       body {
 	  max-width: 90%;
@@ -68,30 +69,46 @@
   <body onload="load()" onresize="resize()">
     <div id="container">
       <div id="run">
-	<button onclick="window.runPython()">Run</button>
+	<button onclick="PWS.runtime()">Run</button>
       </div>
       <div id="test">
-	<button onclick="runTest()">Test and Submit</button>
+	<button onclick="PWS.runtest()">Test and Submit</button>
       </div>
       <div id="editor"></div>
       <pre id="output"></pre>
-      <div id="console"></div>      
+      <div id="console"></div>
     </div>
     <div id="loading">
       Grading...
     </div>
-
     <script src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
-    <script src="skulpt-dist-master/skulpt.js"></script>
-    <script src="skulpt-dist-master/skulpt-stdlib.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script> 
+    <script src="third-party/skulpt-dist-master/skulpt.js"></script>
+    <script src="third-party/skulpt-dist-master/skulpt-stdlib.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.37.2/js/jquery.terminal.min.js"></script>
+    <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
+
+
     <script src="skulpt-run.js"></script>
     <script src="pyodide-run.js"></script>
     <script src="terminal.js"></script>
+    <script src="repl.js"></script>
     
     <script>
-
+      // PWS is the global object this module exports
+      // all configuration should be here.
+      // Most of the configuration are set in load()
+      var PWS = {
+	assignmentRoot: null,
+	fontsize: null,
+	runtime: null,
+	runtest: null,
+	terminal: null,	
+      }
+      
       function resize() {
 	// adjust the width of the editor and container
 	let editorWidth = window.getComputedStyle(document.getElementById('editor')).width.replace('px','');	
@@ -113,41 +130,41 @@
       async function load() {
 	
 	// Set the default interactive python runtime
-	window.runPython = runSkulpt;
-        window.editor = ace.edit("editor");      
-	
+	PWS.runtime = runSkulpt;
+	PWS.runtest = runTest;
+        PWS.editor = ace.edit("editor");
+	    
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
-	window.assignmentRoot = urlParams.get('path') || "labs/lab1";
+	PWS.assignmentRoot = urlParams.get('path') || "labs/lab1";
 	
-	window.editorFontSize = parseInt(urlParams.get('fontsize')) || 12;
-	document.getElementById('output').style.fontSize = editorFontSize+"px";
+	PWS.fontsize = parseInt(urlParams.get('fontsize')) || 12;
+	document.getElementById('output').style.fontSize = PWS.fontsize+"px";
 	
-	editor.setAutoScrollEditorIntoView(true);
-	editor.setTheme("ace/theme/monokai");	
-	editor.session.setMode("ace/mode/python");
-	editor.setFontSize(editorFontSize);
+	PWS.editor.setAutoScrollEditorIntoView(true);
+	PWS.editor.setTheme("ace/theme/monokai");	
+	PWS.editor.session.setMode("ace/mode/python");
+	PWS.editor.setFontSize(PWS.fontsize);
 	
-	resp = await fetch(assignmentRoot+"/main.py");
-	code = await resp.text();
-        editor.session.setValue(code);     
+	let resp = await fetch(PWS.assignmentRoot+"/main.py");
+	let code = await resp.text();
+        PWS.editor.session.setValue(code);     
 
-	r = await fetch(assignmentRoot+"/test.py", {method: 'HEAD'});
+	let r = await fetch(PWS.assignmentRoot+"/test.py", {method: 'HEAD'});
 	if (r.status != 200) {
 	  document.getElementById('test').style.visibility = 'hidden';
 	}
-
-	r = await fetch(assignmentRoot+"/init.js", {method: 'HEAD'});	
+	
+	r = await fetch(PWS.assignmentRoot+"/init.js", {method: 'HEAD'});	
 	if (r.status == 200) {
-	  node = document.createElement('script');
-	  node.src = assignmentRoot+"/init.js";
+	  let node = document.createElement('script');
+	  node.src = PWS.assignmentRoot+"/init.js";
 	  document.body.append(node);
 	}
-
-	resize();
-	initSkulpt();
 	
-	window.term = createTerminal('console') 
+	resize();
+	
+	//PWS.terminal = createTerminal('console')
 	
 	document.getElementById('loading').style.visibility = 'hidden';
       }

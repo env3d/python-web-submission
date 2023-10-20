@@ -1,1 +1,1 @@
-window.runPython = runPyodide;
+PWS.runtime = runPyodide;

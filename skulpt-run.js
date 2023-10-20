@@ -2,18 +2,10 @@
 
 // output functions are configurable.  This one just appends some text
 // to a pre element.
-function outputConsole(text) {
-  text = text.trim();
-  if (text.length > 0) {
-    term.write('\r\n');
-    term.write(text);
-  }
 
-  //var mypre = document.getElementById("console"); 
-  //mypre.innerHTML = mypre.innerHTML + text; 
-}
 
-function output(text) {
+
+function skOutputToDiv(text) {
   document.getElementById("output").innerHTML += text;
 }
 
@@ -27,9 +19,8 @@ function builtinRead(x) {
 function initSkulpt(){
   //Sk.pre = "console";
   
-  console.log('init skulpt');
   Sk.configure( {
-    output: output,
+    output: skOutputToDiv,
     read: builtinRead,
     retainGlobals: true,
     __future__: Sk.python3
@@ -59,15 +50,18 @@ function initSkulpt(){
 // get a reference to your pre element for output
 // configure the output function
 // call Sk.importMainWithBody()
-function runSkulpt(prog) {
-  var prog = editor.session.getValue();
+function runSkulpt() {
+  initSkulpt();
+  
+  let prog = PWS.editor.session.getValue();
   document.getElementById('output').innerHTML = '';
 
-  myPromise = Sk.misceval.asyncToPromise(function() {    
+  let myPromise = Sk.misceval.asyncToPromise(function() {    
     return Sk.importMainWithBody("<stdin>", false, prog, true);
   });
   myPromise.then(function(mod) {
     console.log('success');
+    PWS.terminal.clear();
   }, function(err) {
     document.getElementById('output').innerHTML = err.toString();
     console.log(err.toString());
