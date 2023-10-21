@@ -51,10 +51,14 @@
       
       #output {
 	  grid-area: output;
-	  background-color: white;
-	  color: black;
+	  background-color: rgb(80,80,80);
+	  color: white;
 	  overflow: scroll;
-	  margino: 0;
+	  margin: 0;
+      }
+
+      #output * {
+	  margin: 1em;
       }
       
       #console {
@@ -75,9 +79,13 @@
 	<button onclick="PWS.runtest()">Test and Submit</button>
       </div>
       <div id="editor"></div>
-      <pre id="output"></pre>
+      <div id="output">
+	<pre id="text"></pre>
+      </div>
+      
       <div id="console"></div>
     </div>
+
     <div id="loading">
       Grading...
     </div>

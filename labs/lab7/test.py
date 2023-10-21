@@ -5,7 +5,6 @@ from main import *
 from unittest.mock import MagicMock, patch
 
 class UnitTests(unittest.TestCase):
-
   def test_random_one_color(self):
       # Enter code here
       mockImage = MagicMock()

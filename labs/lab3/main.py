@@ -75,16 +75,10 @@ A local supermarket has a promotion that if you buy cans of chick peas in multip
 For example, if you buy 8 cans of chick peas, you will pay $1.25 * 6 = $7.50 for the first 6 cans plus  $1.50 * 2 = $3.00 for the remaining 2 cans. So, in total, you will pay $10.50.
 Write a function that takes the number of cans as input and calculates the price for that number of cans.
 
-The function below solves a different problem (covered in class).  Modify it so it solves the problem 
-described above.  HINT: you only need to change the condition and the return statements.
-
 """
 
 def calculate_price(num_cans):
-    if num_cans < 5:
-        return num_cans * 1.10
-    else:
-        return num_cans * 0.9
+    return num_cans * 1.0
 
 
 """
@@ -105,7 +99,4 @@ math.sin(angle) function instead of Math.sin(angle)
 def distance( lat1, lon1, lat2, lon2 ):    
     return 0
 
-if __name__ == '__main__':
-    # write some test code here to verify your functions work!
-    pass
     

@@ -6,11 +6,10 @@
 
 
 function skOutputToDiv(text) {
-  document.getElementById("output").innerHTML += text;
+  document.getElementById("text").innerHTML += text;
 }
 
 function builtinRead(x) {
-  console.log('Trying to read '+x);
   if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
     throw "File not found: '" + x + "'";
   return Sk.builtinFiles["files"][x];
@@ -35,26 +34,30 @@ function initSkulpt(){
   // Setup image  
   // need to specify the id to a canvas for the
   // builtin 'image' module to work
-  Sk.canvas = document.getElementById('output').id;
+  //Sk.canvas = document.getElementById('output').id;
+  Sk.canvas = 'output';
+  
   Sk.imageProxy = (str) => {
     return str.startsWith('http') ? str :
       window.location.protocol + '//'
       + window.location.host
       + window.location.pathname + '/'
-      + window.assignmentRoot + '/' + str;
-  };  
+      + PWS.assignmentRoot + '/' + str;
+  };
+  console.log('initializing skulpt');
 }
 
+init = false;
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
 // get a reference to your pre element for output
 // configure the output function
 // call Sk.importMainWithBody()
 function runSkulpt() {
+  // init = init || initSkulpt();
   initSkulpt();
-  
+  document.getElementById('text').innerHTML = '';  
   let prog = PWS.editor.session.getValue();
-  document.getElementById('output').innerHTML = '';
 
   let myPromise = Sk.misceval.asyncToPromise(function() {    
     return Sk.importMainWithBody("<stdin>", false, prog, true);
@@ -63,7 +66,7 @@ function runSkulpt() {
     console.log('success');
     PWS.terminal.clear();
   }, function(err) {
-    document.getElementById('output').innerHTML = err.toString();
+    document.getElementById('text').innerHTML = err.toString();
     console.log(err.toString());
     throw(err);
   });

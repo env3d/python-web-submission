@@ -49,5 +49,5 @@ class UnitTests(unittest.TestCase):
 
   def test_average_mark_boundary(self):
       # Enter code here
-      assert(average_mark(0,0) == 0)
+      assert(average_mark(1,1) == 1)
 

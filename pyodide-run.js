@@ -2,7 +2,7 @@
 async function runPyodide() {
   
   codeString = PWS.editor.session.getValue();
-  output = document.getElementById('output');
+  output = document.getElementById('text');
   output.innerHTML = '';
 
   window.pyodide = await getPyodide();
@@ -18,12 +18,27 @@ async function runTest() {
 
   window.pyodide = await loadPyodide();
   
-  // Create a fake turtle
+  // Create a fake imports
+
   pyodide.FS.writeFile('turtle.py', ["from unittest.mock import MagicMock",
                                      "def Turtle():",
                                      "    return MagicMock()"].join('\n'));
+
+  pyodide.FS.writeFile('image.py', ["from unittest.mock import MagicMock",
+                                    "import sys",
+                                    "import types",                                    
+                                    "module_name = 'image'",
+                                    "bogus_module = types.ModuleType(module_name)",
+                                    "sys.modules[module_name] = bogus_module",
+                                    "bogus_module.ImageWin = MagicMock()",
+                                    "bogus_module.EmptyImage = MagicMock()",
+                                    "bogus_module.FileImage = MagicMock()",
+                                    "bogus_module.Image = MagicMock()",
+                                    "bogus_module.Pixel = MagicMock()"
+                                   ].join('\n'));
+  
   // Put the user code into main.py
-  pyodide.FS.writeFile('main.py', PWS.editor.session.getValue());  
+  pyodide.FS.writeFile('main.py', PWS.editor.session.getValue());
   let mainpkg = pyodide.pyimport('main');
 
   // Create test.py in filesystem  
@@ -42,10 +57,10 @@ async function runTest() {
 	
 	window.test_result = pyodide.globals.get('result').toJs();
 
-	document.getElementById('output').innerHTML = '';
+	document.getElementById('text').innerHTML = '';
 	['errors','failures',''].forEach( (key) => {
 	  element = key === '' ? test_result : test_result[key];
-	  document.getElementById('output').innerHTML += element.toJs().toString()
+	  document.getElementById('text').innerHTML += element.toJs().toString()
 	    .replace(/&/g, '&amp;')
 	    .replace(/</g, '&lt;')
 	    .replace(/>/g, '&gt;')

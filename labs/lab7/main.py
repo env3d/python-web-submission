@@ -12,13 +12,15 @@ https://youtu.be/0TW4QGbXAjY
 
 """
 def createRedImage(width, height):
+    
     im = image.EmptyImage(width, height)
-
+    win = image.ImageWin(im.getWidth(), im.getHeight())
+    
     for x in range(width):
         for y in range(height):
             im.setPixel(x, y, image.Pixel(255, 0, 0))
 
-    im.save("red.gif")
+    im.draw(win)
 
 
 """
@@ -30,13 +32,13 @@ is black with a single white line across the middle of the image
 """
 def createWhiteLine(width, height):
     im = image.EmptyImage(width, height)
-
+    win = image.ImageWin(im.getWidth(), im.getHeight())
     for x in range(width):
         for y in range(height):
             # process each x and y location to set the correct pixel color
             pass
 
-    im.save("white_line.gif")
+    im.draw(win)
 
 
 """
@@ -47,13 +49,14 @@ that alternate between black and white
 """
 def createAlternateLines(width, height):
     im = image.EmptyImage(width, height)
-
+    win = image.ImageWin(im.getWidth(), im.getHeight())
+    
     for x in range(width):
         for y in range(height):
             # process each x and y location to set the correct pixel color
             pass
 
-    im.save("alternate_lines.gif")
+    im.draw(win)
 
 
 """
@@ -64,13 +67,14 @@ each pixel has a 50% chance of being white or black
 """
 def createRandomNoise(width, height):
     im = image.EmptyImage(width, height)
-
+    win = image.ImageWin(im.getWidth(), im.getHeight())
+    
     for x in range(width):
         for y in range(height):
             # process each x and y location to set the correct pixel color
             pass
 
-    im.save("random.gif")
+    im.draw(win)
 
 
 """
@@ -91,11 +95,13 @@ image inside the red channel.  Implement the following algorithm:
 
 """
 def decodeImage():
-    secret = image.FileImage("encoded_image.png")
-
+    secret = image.Image("encoded_image.png")
+    win = image.ImageWin(secret.getWidth(), secret.getHeight())
+    
     for x in range(secret.width):
         for y in range(secret.height):
             # process each x and y location to set the correct pixel color
             pass
 
     # don't forget to save the decoded image!
+    secret.draw(win)

@@ -4,8 +4,6 @@ from main import *
 # Add imports here
 
 from unittest.mock import patch
-from test_support import MyTurtle
-import test_support
 from unittest.mock import Mock
 
 class MyTurtle(Mock):
