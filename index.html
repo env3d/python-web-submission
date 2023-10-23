@@ -188,11 +188,19 @@
 	  }
 	}
 	PWS.editor.completers = [staticWordCompleter];
+	PWS.editor.container.addEventListener('change', e => {
+	  // autosave
+	  localStorage.setItem(`${PWS.assignmentRoot}/main.py`, PWS.editor.session.getValue());
+	});
 
-	
-	let resp = await fetch(PWS.assignmentRoot+"/main.py");
-	let code = await resp.text();
-        PWS.editor.session.setValue(code);     
+	code = localStorage.getItem(`${PWS.assignmentRoot}/main.py`)
+        PWS.editor.session.setValue(code);	
+	if ( code == null ) {
+	  let resp = await fetch(PWS.assignmentRoot+"/main.py");
+	  let code = await resp.text();
+          PWS.editor.session.setValue(code);     	  
+	}
+
 	
 	let r = await fetch(PWS.assignmentRoot+"/test.py", {method: 'HEAD'});
 	if (r.status != 200) {
