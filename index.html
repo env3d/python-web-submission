@@ -135,11 +135,11 @@
 	document.getElementById('editor').style.height = (containerHeight * (0.9 - PWS.consoleheight) )+'px';		
 	document.getElementById('console').style.height = (containerHeight * PWS.consoleheight)+'px';	
       }
-
+      
       async function load() {
 	
 	// Set the default interactive python runtime
-	PWS.runtime = runSkulpt;
+        PWS.runtime = runSkulpt;
 	PWS.runtest = runTest;
 	ace.require("ace/ext/language_tools");	
         PWS.editor = ace.edit("editor");
@@ -158,8 +158,12 @@
 	PWS.editor.setFontSize(PWS.fontsize);
 	document.getElementById('output').style.fontSize = PWS.fontsize+"px";
 
-	history.pushState(null, null, `${window.location.pathname}?path=${PWS.assignmentRoot}`);
+	let hashParams = location.hash !== '' ?
+	    new URLSearchParams(location.hash.slice(1)) :
+	    new URLSearchParams()
+	PWS.launch_id = hashParams.get('launch_id')
 	
+	// history.pushState(null, null, `${window.location.pathname}?path=${PWS.assignmentRoot}`);	
 
 	PWS.editor.setAutoScrollEditorIntoView(true);
 	PWS.editor.setTheme("ace/theme/monokai");	

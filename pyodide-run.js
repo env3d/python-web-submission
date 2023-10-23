@@ -66,6 +66,17 @@ async function runTest() {
 	    .replace(/>/g, '&gt;')
 	    .replace(/"/g, '&quot;');
 	});
-	
+
+	score = 100 * (test_result.testsRun -
+                 (test_result.failures.length + test_result.errors.length)
+                ) / test_result.testsRun;
+  
+  // report score to lms
+  if (PWS.launch_id !== null) {
+    let resp = await fetch(`https://student.operatoroverload.com/lti/api/score/${PWS.launch_id}/${score}/`);
+    let message = await resp.json();
+    console.log(message);
+  }
 	document.getElementById('loading').style.visibility = 'hidden';
+
 }
