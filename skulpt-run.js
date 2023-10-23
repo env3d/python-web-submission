@@ -28,7 +28,7 @@ function initSkulpt(){
   Sk.globals = { __name__: new Sk.builtin.str("__main__")};
 
   // Setup Turtle 
-  (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'output';
+  (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'turtle_canvas';
   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).width = 0;
   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).height = 0;
   // Setup image  
