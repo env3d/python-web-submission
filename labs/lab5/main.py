@@ -1,10 +1,6 @@
 """
     Lab 5: Draw Alkane chains (organic chem. visualization)
-    
-    Author: {your name}
-            (starter project by J. Madar, based on original idea from T. Dakic and J. Fall)
-    Date:  Sep 27, 2022
-    
+           (starter project by J. Madar, based on original idea from T. Dakic and J. Fall)    
 
     Objectives 
 
@@ -44,7 +40,7 @@ def draw_letter(turtle, letter):
     turtle location, where the center of the letter is
     at the turtle's tip
     """
-    height = font_size / (1 - 0.39)
+    height = font_size
     turtle.setx(turtle.xcor() - (font_width / 2))
     turtle.sety(turtle.ycor() - (height / 2))
     turtle.write(letter, font=('Courier', font_size))
