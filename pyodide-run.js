@@ -70,12 +70,24 @@ async function runTest() {
 	score = 100 * (test_result.testsRun -
                  (test_result.failures.length + test_result.errors.length)
                 ) / test_result.testsRun;
+
+  // Must properly encode comment
+  //comment_text = test_result.toJs().toString();
+  comment_text = PWS.editor.session.getValue();
+  comment = btoa(comment_text
+                 .replace(/&/g, '&amp;')
+	               .replace(/</g, '&lt;')
+	               .replace(/>/g, '&gt;')
+	               .replace(/"/g, '&quot;'))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
   
   // report score to lms
   if (PWS.launch_id !== null) {
-    let resp = await fetch(`${PWS.tool_base}/api/score/${PWS.launch_id}/${score}/`);
+    let resp = await fetch(`${PWS.tool_base}/api/score/${PWS.launch_id}/${score}/${comment}`);
     let message = await resp.json();
     console.log(message);
+    alert('submission message from LMS: \n' + JSON.stringify(message, null, 2));
   }
 	document.getElementById('loading').style.visibility = 'hidden';
 
