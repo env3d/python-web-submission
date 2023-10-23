@@ -73,7 +73,7 @@ async function runTest() {
   
   // report score to lms
   if (PWS.launch_id !== null) {
-    let resp = await fetch(`https://student.operatoroverload.com/lti/api/score/${PWS.launch_id}/${score}/`);
+    let resp = await fetch(`${PWS.tool_base}/api/score/${PWS.launch_id}/${score}/`);
     let message = await resp.json();
     console.log(message);
   }

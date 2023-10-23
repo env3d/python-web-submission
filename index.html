@@ -137,9 +137,9 @@
       }
       
       async function load() {
-	
+      
 	// Set the default interactive python runtime
-        PWS.runtime = runSkulpt;
+	PWS.runtime = runSkulpt;
 	PWS.runtest = runTest;
 	ace.require("ace/ext/language_tools");	
         PWS.editor = ace.edit("editor");
@@ -162,6 +162,7 @@
 	    new URLSearchParams(location.hash.slice(1)) :
 	    new URLSearchParams()
 	PWS.launch_id = hashParams.get('launch_id')
+	PWS.tool_base = hashParams.get('tool_base')
 	
 	// history.pushState(null, null, `${window.location.pathname}?path=${PWS.assignmentRoot}`);	
 
