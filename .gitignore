@@ -1,3 +1,5 @@
+debug/chatgpt
+.env
 *~
 _*.tsv
 imdb.db
