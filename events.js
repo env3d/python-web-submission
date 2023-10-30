@@ -109,7 +109,8 @@
   
   window.addEventListener( 'blur', (evt) => {
     // TODO: we can now log or warn users using these events
-    PWS.message('you cannot swtich to a different window during exam', true);
+    // PWS.message('you cannot swtich to a different window during exam', true);
+    console.log('you cannot swtich to a different window during exam');
   });
   
   window.addEventListener( 'focus', (evt) => {

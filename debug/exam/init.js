@@ -2,22 +2,24 @@
 (async function() {
 
 
-  ['contextmenu',
-   'click', 'cut', 'copy', 'paste',
-   'dragenter', 'dragover', 'dragend',
-   'dragstart', 'dragleave', 'drop'
+  [
+    'cut', 'copy', 'paste'
   ].forEach( eventName => {
 
-    [PWS.editor.container, window, document.getElementById('console')].forEach( element => {
+    [PWS.editor].forEach( element => {
       element.addEventListener(eventName, e => {
-        console.log('Event '+eventName, e); 
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
+        console.log('Event '+eventName, e);
+        if (e.text) {
+          e.text='';
+        } else {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
         return false;
       });
     });
-    PWS.editor.setOption("dragEnabled", false);                                            
+
   });
   
 })();
