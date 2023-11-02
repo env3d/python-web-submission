@@ -105,15 +105,9 @@
     <script src="https://cdn.jsdelivr.net/npm/fetch-event-source@1.0.0-alpha.2/index.min.js"></script>
     <!-- Google firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>    
-    <!-- Custom stuff -->    
-    <script src="skulpt-run.js"></script>
-    <script src="pyodide-run.js"></script>
-    <script src="repl.js"></script>
-    <script src="events.js"></script>
-    <script src="sse.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
     
-    
+    <script src="sse.js"></script>    
     
     <script>
       // PWS is the global object this module exports
@@ -163,7 +157,12 @@
 	document.body.append(node);	
       }
 
-
-      </script>
+      
+    </script>
+    <script src="skulpt-run.js"></script>
+    <script src="pyodide-run.js"></script>
+    <script src="repl.js"></script>
+    <script src="events.js"></script>        
+    
   </body>
 </html>

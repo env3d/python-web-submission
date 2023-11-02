@@ -218,6 +218,7 @@ Do not call these functions.
   });
 
   PWS.terminal = repl;
+  PWS.terminal.css('--size', PWS.fontsize / 16);  
   repl.set_command('Write me a simple python function that uses the turtle library');
 
   

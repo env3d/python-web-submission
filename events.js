@@ -23,7 +23,7 @@
 	  PWS.fontsize = parseInt(urlParams.get('fontsize')) || 12;
 	  PWS.editor.setFontSize(PWS.fontsize);
 	  document.getElementById('output').style.fontSize = PWS.fontsize+"px";
-
+    
 	  let hashParams = location.hash !== '' ?
 	      new URLSearchParams(location.hash.slice(1)) :
 	      new URLSearchParams();
@@ -36,7 +36,7 @@
 	  PWS.editor.setTheme("ace/theme/monokai");
     PWS.editor.session.setUseWrapMode(true);
 	  PWS.editor.session.setMode("ace/mode/python");
-	  
+
 	  let staticWordCompleter = {
 	    getCompletions: function(editor, session, pos, prefix, callback) {
 	      wordList = [];
@@ -69,7 +69,7 @@
         PWS.editor.session.setValue(code);     	  
 	    }
     }
-	  
+
 	  r = await fetch(PWS.assignmentRoot+"/test.py", {method: 'HEAD'});
 	  if (r.status != 200) {
 	    document.getElementById('test').style.visibility = 'hidden';
@@ -81,7 +81,8 @@
 	    node.src = PWS.assignmentRoot+"/init.js";
 	    document.body.append(node);
 	  }	
-	  
+
+    PWS.terminal.css('--size', PWS.fontsize / 16);
 	  document.getElementById('loading').style.visibility = 'hidden';
     resize();
   }
