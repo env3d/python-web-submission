@@ -33,7 +33,8 @@
 	  // history.pushState(null, null, `${window.location.pathname}?path=${PWS.assignmentRoot}`);	
 
 	  PWS.editor.setAutoScrollEditorIntoView(true);
-	  PWS.editor.setTheme("ace/theme/monokai");	
+	  PWS.editor.setTheme("ace/theme/monokai");
+    PWS.editor.session.setUseWrapMode(true);
 	  PWS.editor.session.setMode("ace/mode/python");
 	  
 	  let staticWordCompleter = {

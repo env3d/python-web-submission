@@ -90,21 +90,29 @@
     <div id="loading">
       Grading...
     </div>
+    <!-- python runtime -->
     <script src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ext-language_tools.js"></script>
     <script src="third-party/skulpt-dist-master/skulpt.js"></script>
     <script src="third-party/skulpt-dist-master/skulpt-stdlib.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+    <!-- ace editor -->
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ace.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.30.0/src-min-noconflict/ext-language_tools.js"></script>
+    <!-- jquery terminal -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.37.2/js/jquery.terminal.min.js"></script>
     <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
-
-
+    <script src="https://cdn.jsdelivr.net/npm/fetch-event-source@1.0.0-alpha.2/index.min.js"></script>
+    <!-- Google firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>    
+    <!-- Custom stuff -->    
     <script src="skulpt-run.js"></script>
     <script src="pyodide-run.js"></script>
     <script src="repl.js"></script>
     <script src="events.js"></script>
+    <script src="sse.js"></script>
+    
     
     
     <script>
