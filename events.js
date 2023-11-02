@@ -82,7 +82,7 @@
 	    document.body.append(node);
 	  }	
 
-    PWS.terminal.css('--size', PWS.fontsize / 16);
+    PWS.terminal.css('--size', PWS.fontsize / 12);
 	  document.getElementById('loading').style.visibility = 'hidden';
     resize();
   }
