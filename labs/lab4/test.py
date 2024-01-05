@@ -99,5 +99,4 @@ class UnitTests(unittest.TestCase):
               drawConcentricTriangle(i)
               
             assert(num_calls == i or self.myturtle.total_angle == i*360)
-    
 

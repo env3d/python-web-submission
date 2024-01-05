@@ -23,7 +23,7 @@ Write a function that takes American dollars as input
 and return the  Canadian dollars equivalent 
 """
 def convert_dollars(american):
-    return 0
+    return american * 1.29
 
 
 """

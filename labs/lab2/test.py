@@ -28,3 +28,7 @@ class UnitTests(unittest.TestCase):
       # Enter code here
       assert(abs(convert_mileage(15)-15.681) <= 0.00001)
 
+if __name__ == '__main__':
+
+  s = unittest.TestLoader().loadTestsFromTestCase(UnitTests)
+  unittest.TextTestRunner().run(s)

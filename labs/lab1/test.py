@@ -11,4 +11,6 @@ class UnitTests(unittest.TestCase):
       # Enter code here
       assert(gamer_type(90.01) == "pro")
 
-
+if __name__ == '__main__':
+  s = unittest.TestLoader().loadTestsFromTestCase(UnitTests)
+  unittest.TextTestRunner().run(s)

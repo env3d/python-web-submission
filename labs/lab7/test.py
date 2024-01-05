@@ -116,3 +116,7 @@ class UnitTests(unittest.TestCase):
         assert (num_black > 0 and (num_white > 0 or num_red > 0))
         assert (num_black == num_white or num_black == num_red)
 
+if __name__ == '__main__':
+
+  s = unittest.TestLoader().loadTestsFromTestCase(UnitTests)
+  unittest.TextTestRunner().run(s)
