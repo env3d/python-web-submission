@@ -8,4 +8,5 @@ class TestExam(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    s = unittest.TestLoader().loadTestsFromTestCase(UnitTests)
+    unittest.TextTestRunner().run(s)

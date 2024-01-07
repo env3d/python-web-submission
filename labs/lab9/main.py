@@ -40,16 +40,16 @@ of itmes using a for loop and process each item in the list.
 
 """
 
-"""
+
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 from urllib.request import urlopen, Request
 import json
 
-#nltk.download('vader_lexicon')
+nltk.download('vader_lexicon')
 sid = SentimentIntensityAnalyzer()
 
-"""
+
 ##### You will use the following functions to complete the exercises #######
 
 """
@@ -57,22 +57,22 @@ The get_sentiment() function returns a number between -1 and 1 for a given strin
 The higher the number, the more positive the sentiment is.  
 """
 
-"""
+
 def get_sentiment(sentence):     
     return sid.polarity_scores(sentence)['compound']
-"""
+
 
 """
 The get_reddit_news function return a list of current world news titles from reddit's worldnews 
 """
-"""
+
 def get_reddit_news(url = 'https://www.reddit.com/r/worldnews/.json'):
     my_socket = urlopen(Request(url, headers={'User-Agent':'abcde'}))
     dta = my_socket.read()
     reddit_data = json.loads(dta)    
     titles = [x['data']['title'] for x in reddit_data['data']['children']]
     return titles
-"""
+
 
 ####### Start of the exercises #########
 
